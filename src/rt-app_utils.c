@@ -182,6 +182,7 @@ void ftrace_write(int mark_fd, const char *fmt, ...)
 	va_list ap;
 	int n, size = BUF_SIZE;
 	char *tmp, *ntmp;
+	size_t written;
 
 	if (mark_fd < 0) {
 		log_error("invalid mark_fd");
@@ -201,7 +202,9 @@ void ftrace_write(int mark_fd, const char *fmt, ...)
 
 		/* If it worked return success */
 		if (n > -1 && n < size) {
-			write(mark_fd, tmp, n);
+			written = write(mark_fd, tmp, n);
+			if (written == -1)
+				log_error("cannot write to marker fd");
 			free(tmp);
 			return;
 		}
