@@ -34,7 +34,7 @@ static ftrace_data_t ft_data = {
 	.marker_fd = -1,
 };
 
-static inline busywait(struct timespec *to)
+static inline void busywait(struct timespec *to)
 {
 	struct timespec t_step;
 	while (1) {
