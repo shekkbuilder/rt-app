@@ -28,18 +28,30 @@
 
 /* XXX use the proper syscall numbers */
 #ifdef __x86_64__
+#ifndef __NR_sched_setattr
 #define __NR_sched_setattr		314
+#endif
+#ifndef __NR_sched_getattr
 #define __NR_sched_getattr		315
+#endif
 #endif
 
 #ifdef __i386__
+#ifndef __NR_sched_setattr
 #define __NR_sched_setattr		351
+#endif
+#ifndef __NR_sched_getattr
 #define __NR_sched_getattr		352
+#endif
 #endif
 
 #ifdef __arm__
+#ifndef __NR_sched_setattr
 #define __NR_sched_setattr		380
+#endif
+#ifndef __NR_sched_getattr
 #define __NR_sched_getattr		381
+#endif
 #endif
 
 #define SF_SIG_RORUN		2
