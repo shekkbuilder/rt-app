@@ -22,9 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define _RTAPP_TYPES_H_
 
 #include "config.h"
-#ifdef DLSCHED
 #include "dl_syscalls.h"
-#endif
 #include <sched.h>
 #include <pthread.h>
 #include <time.h>
@@ -44,10 +42,8 @@ typedef enum policy_t
 {
 	other = SCHED_OTHER,
 	rr = SCHED_RR,
-	fifo = SCHED_FIFO
-#ifdef DLSCHED
-	, deadline = SCHED_DEADLINE
-#endif
+	fifo = SCHED_FIFO,
+	deadline = SCHED_DEADLINE
 } policy_t;
 
 /* Shared resources */
@@ -88,9 +84,7 @@ typedef struct _thread_data_t {
 	rtapp_tasks_resource_list_t *blockages;
 	int nblockages;
 
-#ifdef DLSCHED
 	struct sched_attr dl_params;
-#endif
 } thread_data_t;
 
 typedef struct _ftrace_data_t {

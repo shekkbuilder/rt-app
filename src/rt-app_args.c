@@ -41,11 +41,7 @@ usage (const char* msg, int ex_code)
 	printf("-T, --ftrace\t\t:\tenable ftrace prints\n");
 	printf("-P, --pi_enabled\t:\tenable priority inheritance on resources\n");
 	printf("-M, --die_on_dmiss\t:\texit with an error if a task misses a deadline\n");
-	printf("\nPOLICY: f=SCHED_FIFO, r=SCHED_RR, o=SCHED_OTHER");
-#ifdef DLSCHED
-	printf(", d=SCHED_DEADLINE");
-#endif
-	printf("\n");
+	printf("\nPOLICY: f=SCHED_FIFO, r=SCHED_RR, o=SCHED_OTHER, d=SCHED_DEADLINE\n");
 	printf("AFFINITY: comma-separated cpu index (starting from 0)\n");
 	printf("\ti.e. 0,2,3 for first, third and fourth CPU\n");
 
@@ -104,12 +100,9 @@ parse_thread_args(char *arg, int idx, thread_data_t *tdata, policy_t def_policy)
 			break;
 
 		case 2:
-#ifdef DLSCHED
 			if (strcmp(token,"d") == 0)
 				tdata->sched_policy = deadline;
-			else
-#endif
-			if (strcmp(token,"f") == 0)
+			else if (strcmp(token,"f") == 0)
 				tdata->sched_policy = fifo;
 			else if (strcmp(token,"r") == 0)
 				tdata->sched_policy = rr ;

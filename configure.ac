@@ -13,16 +13,6 @@ AC_CHECK_LIB([pthread], [pthread_create])
 AC_CHECK_LIB([m], [round])
 AC_CHECK_LIB([rt], [clock_gettime])
 
-AC_ARG_WITH([deadline],
-	[AS_HELP_STRING([--with-deadline],
-         [Add support for SCHED_DEADLINE])],
-	[],
-	[with_deadline=no])
-
-AS_IF([test "x$with_deadline" != xno],
-	[AC_DEFINE([DLSCHED], [1], [Define if you have SCHED_DEADLINE support])
-     ])
-
 AC_ARG_WITH([json],
 	    [AS_HELP_STRING([--with-json],
 			    [Add support for reading json config file]

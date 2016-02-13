@@ -136,11 +136,9 @@ void *thread_body(void *arg)
 	timing_point_t *timings;
 	timing_point_t tmp_timing;
 	timing_point_t *curr_timing;
-#ifdef DLSCHED
 	pid_t tid;
 	struct sched_attr attr;
 	unsigned int flags = 0;
-#endif
 	int ret, i = 0;
 	int j;
 
@@ -206,7 +204,6 @@ void *thread_body(void *arg)
 			data->lock_pages = 0; /* forced off for SCHED_OTHER */
 			break;
 
-#ifdef DLSCHED
 		case deadline:
 			fprintf(data->log_handler, "# Policy : SCHED_DEADLINE\n");
 			tid = gettid();
@@ -219,7 +216,6 @@ void *thread_body(void *arg)
 			attr.sched_deadline = timespec_to_nsec(&data->deadline);
 			attr.sched_period = timespec_to_nsec(&data->period);
 			break;
-#endif
 
 		default:
 			log_error("Unknown scheduling policy %d",
@@ -269,11 +265,11 @@ void *thread_body(void *arg)
 		log_notice("[%d] Starting...", data->ind);
 	}
 
-#ifdef DLSCHED
-	/* TODO find a better way to handle that constraint */
 	/*
 	 * Set the task to SCHED_DEADLINE as far as possible touching its
 	 * budget as little as possible for the first iteration.
+	 *
+	 * TODO: find a better way to handle this constraint.
 	 */
 	if (data->sched_policy == SCHED_DEADLINE) {
 		log_notice("[%d] starting thread with period: %llu, exec: %llu,"
@@ -293,7 +289,6 @@ void *thread_body(void *arg)
 			exit(EXIT_FAILURE);
 		}
 	}
-#endif
 
 	if (opts.ftrace)
 		log_ftrace(ft_data.marker_fd, "[%d] starts", data->ind);

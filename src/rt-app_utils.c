@@ -38,13 +38,11 @@ timespec_to_usec(struct timespec *ts)
 	return round((ts->tv_sec * 1E9 + ts->tv_nsec) / 1000.0);
 }
 
-#ifdef DLSCHED
 __u64
 timespec_to_nsec(struct timespec *ts)
 {
 	return round(ts->tv_sec * 1E9 + ts->tv_nsec);
 }
-#endif
 
 struct timespec
 usec_to_timespec(unsigned long usec)
@@ -135,13 +133,10 @@ log_timing(FILE *handler, timing_point_t *t)
 	fprintf(handler, "\n");
 }
 
-#ifdef DLSCHED
-pid_t
-gettid(void)
+pid_t gettid(void)
 {
 	return syscall(__NR_gettid);
 }
-#endif
 
 int
 string_to_policy(const char *policy_name, policy_t *policy)
@@ -152,10 +147,8 @@ string_to_policy(const char *policy_name, policy_t *policy)
 		*policy =  rr;
 	else if (strcmp(policy_name, "SCHED_FIFO") == 0)
 		*policy =  fifo;
-#ifdef DLSCHED
 	else if (strcmp(policy_name, "SCHED_DEADLINE") == 0)
 		*policy =  deadline;
-#endif
 	else
 		return 1;
 	return 0;
@@ -174,11 +167,9 @@ policy_to_string(policy_t policy, char *policy_name)
 		case fifo:
 			strcpy(policy_name, "SCHED_FIFO");
 			break;
-#ifdef DLSCHED
 		case deadline:
 			strcpy(policy_name, "SCHED_DEADLINE");
 			break;
-#endif
 		default:
 			return 1;
 	}

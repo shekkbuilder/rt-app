@@ -112,13 +112,10 @@ timespec_lower(struct timespec *what, struct timespec *than);
 void
 log_timing(FILE *handler, timing_point_t *t);
 
-#ifdef DLSCHED
-pid_t
-gettid(void);
+pid_t gettid(void);
 
 unsigned long long
 timespec_to_nsec(struct timespec *ts);
-#endif
 
 int
 string_to_policy(const char *policy_name, policy_t *policy);
