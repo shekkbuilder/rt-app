@@ -20,7 +20,7 @@ AC_ARG_WITH([json],
 	    ], [], [with_json=no]
 	   )
 AS_IF([test "x$with_json" != "xno"],
-        [PKG_CHECK_MODULES([LIBJSON], [json-c], [AC_DEFINE([JSON], [1], [Define if you have libjson])])
+        [PKG_CHECK_MODULES([LIBJSON], [json], [AC_DEFINE([JSON], [1], [Define if you have libjson])])
      ])
 
 AM_CONDITIONAL([AMJSON], [ test x$with_json != xno])
