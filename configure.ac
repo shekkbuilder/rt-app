@@ -1,5 +1,6 @@
-AC_INIT([rt-app], [0.2_alpha2], [g.bagnoli@asidev.com])
-AC_COPYRIGHT([Copyright (C) 2009 Giacomo Bagnoli <g.bagnoli@asidev.com])
+AC_INIT([rt-app], [0.3], [juri.lelli@arm.com])
+AC_COPYRIGHT([Copyright (C) 2009 Giacomo Bagnoli <g.bagnoli@asidev.com>
+Copyright (C) 2014  Juri Lelli <juri.lelli@arm.com>])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign dist-bzip2])
 m4_pattern_allow([AM_PROG_AR])
