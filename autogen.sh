@@ -7,5 +7,5 @@ echo "----------------------------------------------------------------"
 echo "Initialized build system. For a common configuration please run:"
 echo "----------------------------------------------------------------"
 echo
-echo "./configure --with-json"
+echo "./configure --with-json [--enable-static-build]"
 echo

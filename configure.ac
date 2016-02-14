@@ -25,6 +25,14 @@ AS_IF([test "x$with_json" != "xno"],
 
 AM_CONDITIONAL([AMJSON], [ test x$with_json != xno])
 
+AC_ARG_ENABLE([static-build],
+	    [AS_HELP_STRING([--enable-static-build],
+			    [Build a static binary]
+			   )
+	    ], [], [enable_static_build=no]
+	   )
+AM_CONDITIONAL([AMSTATIC], [ test x$enable_static_build != xno])
+
 AC_ARG_VAR([LOGLVL], [verbosity level, from 0 to 100. 100 is very verbose])
 
 if test -z "${LOGLVL}";then

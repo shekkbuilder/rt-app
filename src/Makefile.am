@@ -7,3 +7,6 @@ rt_app_SOURCES += rt-app_parse_config.h rt-app_parse_config.c
 AM_CPPFLAGS += $(LIBJSON_CFLAGS)
 endif
 rt_app_LDADD = ../libdl/libdl.a $(LIBJSON_LIBS)
+if AMSTATIC
+rt_app_LDFLAGS = -all-static
+endif
