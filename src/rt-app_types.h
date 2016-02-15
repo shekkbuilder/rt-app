@@ -73,7 +73,7 @@ typedef struct _thread_data_t {
 	char *cpuset_str;
 	unsigned long wait_before_start;
 	struct timespec min_et, max_et;
-	struct timespec period, deadline;
+	struct timespec runtime, period, deadline;
 	struct timespec main_app_start;
 	int loop;
 

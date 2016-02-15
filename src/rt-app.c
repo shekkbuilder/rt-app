@@ -213,8 +213,7 @@ void *thread_body(void *arg)
 			attr.sched_flags = 0;
 			attr.sched_policy = SCHED_DEADLINE;
 			attr.sched_priority = 0;
-			attr.sched_runtime = timespec_to_nsec(&data->max_et) +
-					(timespec_to_nsec(&data->max_et) /100) * BUDGET_OVERP;
+			attr.sched_runtime = timespec_to_nsec(&data->runtime);
 			attr.sched_deadline = timespec_to_nsec(&data->deadline);
 			attr.sched_period = timespec_to_nsec(&data->period);
 			break;
@@ -274,7 +273,7 @@ void *thread_body(void *arg)
 	 * TODO: find a better way to handle this constraint.
 	 */
 	if (data->sched_policy == SCHED_DEADLINE) {
-		log_notice("[%d] starting thread with period: %llu, exec: %llu,"
+		log_notice("[%d] starting thread with period: %llu, runtime: %llu,"
 			   "deadline: %llu, priority: %d",
 			   data->ind,
 			   attr.sched_period / 1000,

@@ -38,6 +38,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #define DEFAULT_THREAD_PRIORITY 10
 #define PATH_LENGTH 256
+#define BUDGET_OVERP 5
 
 void
 parse_config(const char *filename, rtapp_options_t *opts);

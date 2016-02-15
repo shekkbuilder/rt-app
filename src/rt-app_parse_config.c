@@ -327,7 +327,7 @@ static void
 parse_thread_data(char *name, struct json_object *obj, int idx,
 		  thread_data_t *data, const rtapp_options_t *opts)
 {
-	long exec, period, dline;
+	long exec, rtime, period, dline;
 	char *policy;
 	char def_policy[RTAPP_POLICY_DESCR_LENGTH];
 	struct array_list *cpuset;
@@ -366,6 +366,20 @@ parse_thread_data(char *name, struct json_object *obj, int idx,
 	}
 	data->min_et = usec_to_timespec(exec);
 	data->max_et = usec_to_timespec(exec);
+
+	/*
+	 * runtime
+	 * used to setup SCHED_DEADLINE reservation parameters
+	 * if not specified we default to exec + BUDGET_OVERP%
+	 * (to account for overheads)
+	 */
+	rtime = get_int_value_from(obj, "runtime", TRUE,
+			exec + ((exec / 100) * BUDGET_OVERP));
+	if (rtime > period) {
+		log_critical(PIN2 "Runtime cannot be less than period");
+		exit(EXIT_INV_CONFIG);
+	}
+	data->runtime = usec_to_timespec(rtime);
 
 	/* deadline */
 	dline = get_int_value_from(obj, "deadline", TRUE, period);
