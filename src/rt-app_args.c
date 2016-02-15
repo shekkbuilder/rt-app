@@ -35,7 +35,6 @@ usage (const char* msg, int ex_code)
 	printf("-s, --spacing\t\t:\tmsec to wait beetween thread starts\n");
 	printf("-l, --logdir\t\t:\tsave logs to different directory\n");
 	printf("-b, --baselog\t\t:\tbasename for logs (implies -l . if not set)\n");
-	printf("-G, --gnuplot\t\t:\tgenerate gnuplot script (needs -l)\n");
 	printf("-D, --duration\t\t:\ttime (in seconds) before stopping threads\n");
 	printf("-K, --no-mlock\t\t:\tDo not lock pages in memory\n");
 	printf("-T, --ftrace\t\t:\tenable ftrace prints\n");
@@ -188,7 +187,6 @@ parse_command_line_options(int argc, char **argv, rtapp_options_t *opts)
 
 	/* set defaults */
 	opts->spacing = 0;
-	opts->gnuplot = 0;
 	opts->lock_pages = 1;
 	opts->duration = -1;
 	opts->logbasename = strdup("rt-app");
@@ -208,7 +206,6 @@ parse_command_line_options(int argc, char **argv, rtapp_options_t *opts)
 				{"spacing", 1, 0, 's'},
 				{"logdir", 1, 0, 'l'},
 				{"baselog", 1, 0, 'b'},
-				{"gnuplot", 1, 0, 'G'},
 				{"duration", 1, 0, 'D'},
 				{"ftrace", 0, 0, 'T'},
 				{"pi_enabled", 0, 0, 'T'},
@@ -266,9 +263,6 @@ parse_command_line_options(int argc, char **argv, rtapp_options_t *opts)
 						  &opts->threads_data[opts->nthreads],
 						  opts->policy);
 				opts->nthreads++;
-				break;
-			case 'G':
-				opts->gnuplot = 1;
 				break;
 			case 'D':
 				opts->duration = strtol(optarg, NULL, 10);

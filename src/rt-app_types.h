@@ -106,7 +106,6 @@ typedef struct _rtapp_options_t {
 
 	char *logdir;
 	char *logbasename;
-	int gnuplot;
 
 	rtapp_resource_t *resources;
 	int nresources;

@@ -469,7 +469,6 @@ parse_global(struct json_object *global, rtapp_options_t *opts)
 	log_info(PFX "Parsing global section");
 	opts->spacing = get_int_value_from(global, "spacing", TRUE, 0);
 	opts->duration = get_int_value_from(global, "duration", TRUE, -1);
-	opts->gnuplot = get_bool_value_from(global, "gnuplot", TRUE, 0);
 	policy = get_string_value_from(global, "default_policy",
 				       TRUE, "SCHED_OTHER");
 	if (string_to_policy(policy, &opts->policy) != 0) {

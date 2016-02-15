@@ -383,7 +383,6 @@ exit_miss:
 int main(int argc, char* argv[])
 {
 	struct timespec t_curr, t_next, t_start;
-	FILE *gnuplot_script = NULL;
 	int i, res;
 	thread_data_t *tdata;
 	char tmp[PATH_LENGTH];
@@ -464,78 +463,6 @@ int main(int argc, char* argv[])
 				  thread_body,
 				  (void*) tdata))
 			goto exit_err;
-	}
-
-	/* print gnuplot files */
-	if (opts.logdir && opts.gnuplot) {
-		snprintf(tmp, PATH_LENGTH, "%s/%s-duration.plot",
-			 opts.logdir, opts.logbasename);
-		gnuplot_script = fopen(tmp, "w+");
-		snprintf(tmp, PATH_LENGTH, "%s-duration.eps",
-			 opts.logbasename);
-		fprintf(gnuplot_script,
-			"set terminal postscript enhanced color\n"
-			"set output '%s'\n"
-			"set grid\n"
-			"set key outside right\n"
-			"set title \"Measured exec time per period\"\n"
-			"set xlabel \"Cycle start time [usec]\"\n"
-			"set ylabel \"Exec Time [usec]\"\n"
-			"plot ", tmp);
-
-		for (i=0; i<nthreads; i++) {
-			snprintf(tmp, PATH_LENGTH, "%s/%s-duration.plot",
-				 opts.logdir, opts.logbasename);
-
-			fprintf(gnuplot_script,
-				"\"%s-%s.log\" u ($5/1000):9 w l"
-				" title \"thread [%s] (%s)\"",
-				opts.logbasename, opts.threads_data[i].name,
-				opts.threads_data[i].name,
-				opts.threads_data[i].sched_policy_descr);
-
-			if ( i == nthreads-1)
-				fprintf(gnuplot_script, "\n");
-			else
-				fprintf(gnuplot_script, ", ");
-		}
-
-		fprintf(gnuplot_script, "set terminal wxt\nreplot\n");
-		fclose(gnuplot_script);
-
-		snprintf(tmp, PATH_LENGTH, "%s/%s-slack.plot",
-			 opts.logdir, opts.logbasename);
-		gnuplot_script = fopen(tmp, "w+");
-		snprintf(tmp, PATH_LENGTH, "%s-slack.eps",
-			 opts.logbasename);
-
-		fprintf(gnuplot_script,
-			"set terminal postscript enhanced color\n"
-			"set output '%s'\n"
-			"set grid\n"
-			"set key outside right\n"
-			"set title \"Slack (negative = tardiness)\"\n"
-			"set xlabel \"Cycle start time [msec]\"\n"
-			"set ylabel \"Slack/Tardiness [usec]\"\n"
-			"plot ", tmp);
-
-		for (i=0; i < nthreads; i++) {
-			fprintf(gnuplot_script,
-				"\"%s-%s.log\" u ($5/1000):10 w l"
-				" title \"thread [%s] (%s)\"",
-				opts.logbasename, opts.threads_data[i].name,
-				opts.threads_data[i].name,
-				opts.threads_data[i].sched_policy_descr);
-
-			if ( i == nthreads-1)
-				fprintf(gnuplot_script, ", 0 notitle\n");
-			else
-				fprintf(gnuplot_script, ", ");
-
-		}
-
-		fprintf(gnuplot_script, "set terminal wxt\nreplot\n");
-		fclose(gnuplot_script);
 	}
 
 	if (opts.duration > 0) {
