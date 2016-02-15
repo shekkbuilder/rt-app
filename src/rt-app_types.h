@@ -72,7 +72,7 @@ typedef struct _thread_data_t {
 	cpu_set_t *cpuset;
 	char *cpuset_str;
 	unsigned long wait_before_start;
-	struct timespec min_et, max_et;
+	struct timespec exec;
 	struct timespec runtime, period, deadline;
 	struct timespec main_app_start;
 	int loop;
@@ -118,8 +118,7 @@ typedef struct _rtapp_options_t {
 typedef struct _timing_point_t {
 	int ind;
 	unsigned long period;
-	unsigned long min_et;
-	unsigned long max_et;
+	unsigned long exec;
 	unsigned long rel_start_time;
 	unsigned long abs_start_time;
 	unsigned long end_time;

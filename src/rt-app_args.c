@@ -86,15 +86,13 @@ parse_thread_args(char *arg, int idx, thread_data_t *tdata, policy_t def_policy)
 
 		case 1:
 			exec = strtol(token,NULL, 10);
-			//TODO: add support for max_et somehow
 			if (exec > period)
 				usage("Exec time cannot be greater than"
 				      " period.", EXIT_INV_COMMANDLINE);
 			if (exec <= 0 )
 				usage("Cannot set negative exec time",
 				      EXIT_INV_COMMANDLINE);
-			tdata->min_et = usec_to_timespec(exec);
-			tdata->max_et = usec_to_timespec(exec);
+			tdata->exec = usec_to_timespec(exec);
 			i++;
 			break;
 

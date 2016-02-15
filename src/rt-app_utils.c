@@ -118,11 +118,10 @@ void
 log_timing(FILE *handler, timing_point_t *t)
 {
 	fprintf(handler,
-		"%d\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%ld",
+		"%d\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%ld",
 		t->ind,
 		t->period,
-		t->min_et,
-		t->max_et,
+		t->exec,
 		t->rel_start_time,
 		t->abs_start_time,
 		t->end_time,

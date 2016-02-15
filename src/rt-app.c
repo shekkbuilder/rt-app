@@ -46,11 +46,13 @@ static inline void busywait(struct timespec *to)
 	}
 }
 
-void run(int ind, struct timespec *min, struct timespec *max,
-	 rtapp_tasks_resource_list_t *blockages, int nblockages)
+void run(int ind,
+	 struct timespec *exec,
+	 rtapp_tasks_resource_list_t *blockages,
+	 int nblockages)
 {
 	int i;
-	struct timespec t_start, now, t_exec, t_totexec = *max;
+	struct timespec t_start, now, t_exec, t_totexec = *exec;
 	rtapp_resource_access_list_t *lock, *last;
 
 	/* Get the start time */
@@ -186,7 +188,7 @@ void *thread_body(void *arg)
 				   "deadline: %lu, priority: %d",
 				   data->ind,
 				   timespec_to_usec(&data->period),
-				   timespec_to_usec(&data->min_et),
+				   timespec_to_usec(&data->exec),
 				   timespec_to_usec(&data->deadline),
 				   data->sched_prio);
 			break;
@@ -200,7 +202,7 @@ void *thread_body(void *arg)
 				   "deadline: %lu",
 				   data->ind,
 				   timespec_to_usec(&data->period),
-				   timespec_to_usec(&data->min_et),
+				   timespec_to_usec(&data->exec),
 				   timespec_to_usec(&data->deadline));
 
 			data->lock_pages = 0; /* forced off for SCHED_OTHER */
@@ -248,7 +250,7 @@ void *thread_body(void *arg)
 		timings = malloc ( nperiods * sizeof(timing_point_t));
 	}
 
-	fprintf(data->log_handler, "#idx\tperiod\tmin_et\tmax_et\trel_st\tstart"
+	fprintf(data->log_handler, "#idx\tperiod\texec\trel_st\tstart"
 				   "\t\tend\t\tdeadline\tdur.\tslack"
 				   "\tBudget\tUsed Budget\n");
 
@@ -305,8 +307,7 @@ void *thread_body(void *arg)
 			log_ftrace(ft_data.marker_fd, "[%d] begins loop %d", data->ind, i);
 
 		clock_gettime(CLOCK_MONOTONIC, &t_start);
-		run(data->ind, &data->min_et, &data->max_et, data->blockages,
-		    data->nblockages);
+		run(data->ind, &data->exec, data->blockages, data->nblockages);
 		clock_gettime(CLOCK_MONOTONIC, &t_end);
 
 		t_diff = timespec_sub(&t_end, &t_start);
@@ -320,8 +321,7 @@ void *thread_body(void *arg)
 
 		curr_timing->ind = data->ind;
 		curr_timing->period = timespec_to_usec(&data->period);
-		curr_timing->min_et = timespec_to_usec(&data->min_et);
-		curr_timing->max_et = timespec_to_usec(&data->max_et);
+		curr_timing->exec = timespec_to_usec(&data->exec);
 		curr_timing->rel_start_time =
 			t_start_usec - timespec_to_usec(&data->main_app_start);
 		curr_timing->abs_start_time = t_start_usec;
