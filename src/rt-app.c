@@ -26,8 +26,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 static int errno;
 static volatile int continue_running;
+static struct timespec t_zero;
 static pthread_t *threads;
 static int nthreads;
+static pthread_barrier_t threads_barrier;
 rtapp_options_t opts;
 
 static ftrace_data_t ft_data = {
@@ -98,7 +100,7 @@ void run(int ind,
 	}
 
 	/* Compute finish time for CPUTIME_ID clock */
-	t_exec = timespec_add(&t_start, &t_totexec);
+	t_exec = timespec_add(&t_start, exec);
 	log_debug("[%d] busywait for %lu", ind, timespec_to_usec(&t_exec));
 	if (opts.ftrace)
 		log_ftrace(ft_data.marker_fd,
@@ -133,7 +135,7 @@ void *thread_body(void *arg)
 {
 	thread_data_t *data = (thread_data_t*) arg;
 	struct sched_param param;
-	struct timespec t_now, t_next;
+	struct timespec t, t_next;
 	unsigned long t_start_usec;
 	unsigned long my_duration_usec;
 	int nperiods;
@@ -254,20 +256,6 @@ void *thread_body(void *arg)
 				   "\t\tend\t\tdeadline\tdur.\tslack"
 				   "\tBudget\tUsed Budget\n");
 
-
-	if (data->wait_before_start > 0) {
-		log_notice("[%d] Waiting %ld usecs... ", data->ind,
-			 data->wait_before_start);
-		clock_gettime(CLOCK_MONOTONIC, &t_now);
-		t_next = usec_to_timespec(data->wait_before_start);
-		t_next = timespec_add(&t_now, &t_next);
-		clock_nanosleep(CLOCK_MONOTONIC,
-				TIMER_ABSTIME,
-				&t_next,
-				NULL);
-		log_notice("[%d] Starting...", data->ind);
-	}
-
 	/*
 	 * Set the task to SCHED_DEADLINE as far as possible touching its
 	 * budget as little as possible for the first iteration.
@@ -293,12 +281,49 @@ void *thread_body(void *arg)
 		}
 	}
 
+	if (data->ind == 0) {
+		clock_gettime(CLOCK_MONOTONIC, &t_zero);
+		if (opts.ftrace)
+			log_ftrace(ft_data.marker_fd,
+				   "[%d] sets zero time",
+				   data->ind);
+	}
+	pthread_barrier_wait(&threads_barrier);
+	t_next = t_zero;
+
+	if (data->wait_before_start > 0) {
+		log_notice("[%d] Waiting %ld usecs... ", data->ind,
+			 data->wait_before_start);
+		if (opts.ftrace)
+			log_ftrace(ft_data.marker_fd,
+				   "[%d] Waiting %ld usecs... ",
+				   data->ind, data->wait_before_start);
+		t = t_next;
+		t_next = usec_to_timespec(data->wait_before_start);
+		t_next = timespec_add(&t, &t_next);
+		log_notice("[%d] Starting...", data->ind);
+		if (opts.ftrace)
+			log_ftrace(ft_data.marker_fd,
+				   "[%d] Starting...", data->ind);
+	}
+
+	log_notice("[%d] Waiting 1 sec more... ", data->ind);
+	if (opts.ftrace)
+		log_ftrace(ft_data.marker_fd,
+			   "[%d] Waiting 1 sec more... ",
+			   data->ind);
+	t = t_next;
+	t_next = msec_to_timespec(1000ULL);
+	t_next = timespec_add(&t, &t_next);
+	clock_nanosleep(CLOCK_MONOTONIC,
+			TIMER_ABSTIME,
+			&t_next,
+			NULL);
+
+	data->deadline = timespec_add(&t_next, &data->deadline);
+
 	if (opts.ftrace)
 		log_ftrace(ft_data.marker_fd, "[%d] starts", data->ind);
-
-	clock_gettime(CLOCK_MONOTONIC, &t_now);
-	t_next = t_now;
-	data->deadline = timespec_add(&t_now, &data->deadline);
 
 	while (continue_running &&  (i != data->loop)) {
 		struct timespec t_start, t_end, t_diff, t_slack;
@@ -349,9 +374,7 @@ void *thread_body(void *arg)
 			goto exit_miss;
 		}
 
-		clock_gettime(CLOCK_MONOTONIC, &t_now);
-		if (timespec_lower(&t_now, &t_next))
-			clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t_next, NULL);
+		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t_next, NULL);
 
 		i++;
 	}
@@ -392,6 +415,7 @@ int main(int argc, char* argv[])
 	/* allocated threads */
 	nthreads = opts.nthreads;
 	threads = malloc(nthreads * sizeof(pthread_t));
+	pthread_barrier_init(&threads_barrier, NULL, nthreads);
 
 	/* install a signal handler for proper shutdown */
 	signal(SIGQUIT, shutdown);
